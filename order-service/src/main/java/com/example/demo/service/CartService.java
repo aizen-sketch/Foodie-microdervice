@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,9 +74,10 @@ public class CartService {
                 break;
             }
         }
-        
+        item.setCart(cart);
+        //adding item :
         if (!itemExists) {
-            cart.getItems().add(item);
+        	cart.getItems().add(item);
             double totalBillamount = calculateTotalAmount(cart);
             cart.setTotalAmount(totalBillamount);
         }
