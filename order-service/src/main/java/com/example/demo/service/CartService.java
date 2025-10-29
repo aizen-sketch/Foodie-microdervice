@@ -1,13 +1,10 @@
 package com.example.demo.service;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 import com.example.demo.Repository.CartRepository;
 import com.example.demo.dto.MenuItemDto;
 import com.example.demo.model.Cart;
@@ -95,6 +92,7 @@ public class CartService {
     public Cart clearCart(Long userId) {
         Cart cart = getCartByUser(userId);
         cart.getItems().clear();
+        cart.setTotalAmount(0.0);
         return cartRepository.save(cart);
     }
 

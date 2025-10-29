@@ -3,6 +3,8 @@ package com.example.demo.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,12 +18,13 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long order_id;
 
     private Long userId;
     private Double totalAmount;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference 
     private List<OrderItem> items = new ArrayList<>();
     private String status;
     // helper method
@@ -31,11 +34,11 @@ public class Order {
     }
 
 	public Long getId() {
-		return id;
+		return order_id;
 	}
 
 	public void setId(Long id) {
-		this.id = id;
+		this.order_id = id;
 	}
 
 	public Long getUserId() {

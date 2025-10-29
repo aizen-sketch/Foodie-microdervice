@@ -57,6 +57,5 @@ public class CartItem {
 		this.cart = cart;
 	}
 
-    // getters & setters
     
 }

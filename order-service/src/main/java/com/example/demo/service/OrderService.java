@@ -1,14 +1,11 @@
 package com.example.demo.service;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.DoubleStream;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
-import com.example.demo.Repository.CartRepository;
 import com.example.demo.Repository.OrderRepository;
+import com.example.demo.dto.MenuItemDto;
 import com.example.demo.model.Cart;
 import com.example.demo.model.CartItem;
 import com.example.demo.model.Order;
@@ -24,7 +21,12 @@ public class OrderService {
     
     @Autowired
     private CartService cartService;
-
+    
+    private MenuItemDto getMenuItemDetails(Long id) {
+        String url = "http://localhost:8080/menu/" + id;
+        return restTemplate.getForObject(url, MenuItemDto.class);
+    }
+    
     public Order placeOrder(Long userId) {
 
         // Load Cart
@@ -45,6 +47,9 @@ public class OrderService {
         for (CartItem cartItem : cart.getItems()) {
             OrderItem item = new OrderItem();
             item.setMenuItemId(cartItem.getMenuItemId());
+            MenuItemDto menuItem = getMenuItemDetails(item.getMenuItemId());
+            item.setName(menuItem.getName());
+            item.setPrice(menuItem.getPrice());
             item.setQuantity(cartItem.getQuantity());
             item.setOrder(order); // attach to order
             items.add(item);
