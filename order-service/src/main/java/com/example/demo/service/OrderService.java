@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import com.example.demo.Repository.OrderRepository;
 import com.example.demo.dto.MenuItemDto;
+import com.example.demo.event.OrderPlacedEvent;
 import com.example.demo.model.Cart;
 import com.example.demo.model.CartItem;
 import com.example.demo.model.Order;
@@ -18,6 +19,11 @@ public class OrderService {
     
     @Autowired
     private RestTemplate restTemplate;
+    private final OrderProducer orderProducer;
+
+    public OrderService(OrderProducer orderProducer) {
+        this.orderProducer = orderProducer;
+    }
     
     @Autowired
     private CartService cartService;
@@ -62,7 +68,13 @@ public class OrderService {
         cartService.clearCart(userId);
 
         // ✅ TODO Later: Publish OrderPlacedEvent → Payment & Inventory Services
-
+        OrderPlacedEvent e=new OrderPlacedEvent();
+        e.setUserId(userId);
+        e.setOrderId(savedOrder.getId());
+        e.setItems(items);
+        e.setTotalAmount(savedOrder.getTotalAmount());
+        e.setStatus("payment pending");
+        orderProducer.sendOrderPlacedEvent(e);
         return savedOrder;
     }
 
