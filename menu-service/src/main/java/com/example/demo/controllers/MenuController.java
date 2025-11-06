@@ -11,7 +11,7 @@ import com.example.demo.repository.menuRepository;
 import com.example.demo.service.MenuItemService;
 
 @RestController
-@RequestMapping("/menu")
+@RequestMapping("/item")
 public class MenuController {
 	
 	@Autowired
@@ -19,7 +19,7 @@ public class MenuController {
 	@Autowired
 	private MenuItemService menuService;
 
-	@GetMapping
+	@GetMapping("/all")
 	public List<MenuItemDto> getAllMenuItems() {
 	    return menuService.getAllItems();
 	}
@@ -37,6 +37,7 @@ public class MenuController {
 	public MenuItemDto updateMenuItem(@PathVariable Integer id, @RequestBody MenuItemDto item) {
 	    return menuService.updateItem(id, item);
 	}
+	
 
 	@DeleteMapping("/{id}")
 	public String deleteMenuItem(@PathVariable Integer id) {
