@@ -1,7 +1,11 @@
 package com.example.demo.controller;
 
 
+import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -53,4 +57,31 @@ public class AuthController {
         var existingUser = userRepository.findByUsername(user.getUsername()).get();
         return jwtUtil.generateToken(userDetails, existingUser.getRole().name());
     }
+    @GetMapping("/validate")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String tokenHeader) {
+        try {
+            if (tokenHeader == null || !tokenHeader.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing token");
+            }
+
+            String token = tokenHeader.substring(7);
+            String username = jwtUtil.extractUsername(token);
+            String role = jwtUtil.extractRole(token); // we’ll add this below
+            Optional<User> user = userRepository.findByUsername(username);
+            Long id = user.get().getId();
+            if (username != null && !jwtUtil.isTokenExpired(token)) {
+                return ResponseEntity.ok(Map.of(
+                		"id",id,
+                        "valid", true,
+                        "username", username,
+                        "role", role
+                ));
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+    }
+
 }
