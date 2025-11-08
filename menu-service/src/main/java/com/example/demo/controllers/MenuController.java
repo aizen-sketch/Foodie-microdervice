@@ -11,7 +11,7 @@ import com.example.demo.repository.menuRepository;
 import com.example.demo.service.MenuItemService;
 
 @RestController
-@RequestMapping("/item")
+@RequestMapping("/menu")
 public class MenuController {
 	
 	@Autowired

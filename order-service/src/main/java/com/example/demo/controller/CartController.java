@@ -14,7 +14,7 @@ import com.example.demo.model.CartItem;
 import com.example.demo.service.CartService;
 
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/order/cart")
 public class CartController {
 
     @Autowired

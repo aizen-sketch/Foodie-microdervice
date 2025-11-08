@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/order")
 public class OrderController {
 
     @Autowired
@@ -27,7 +27,7 @@ public class OrderController {
     }
 
     //  Get details of a specific order
-    @GetMapping("/{orderId}")
+    @GetMapping("/specific/{orderId}")
     public Order getOrderById(@PathVariable Long orderId) {
         return orderService.getOrderById(orderId);
     }
