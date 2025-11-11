@@ -55,7 +55,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword()));
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
         var existingUser = userRepository.findByUsername(user.getUsername()).get();
-        return jwtUtil.generateToken(userDetails, existingUser.getRole().name());
+        return jwtUtil.generateToken(userDetails, existingUser.getRole().name(),existingUser.getId());
     }
     @GetMapping("/validate")
     public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String tokenHeader) {

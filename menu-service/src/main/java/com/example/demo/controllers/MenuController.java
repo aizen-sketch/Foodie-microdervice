@@ -1,8 +1,11 @@
 package com.example.demo.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.Entity.menuItems;
@@ -18,10 +21,19 @@ public class MenuController {
 	private menuRepository repo;
 	@Autowired
 	private MenuItemService menuService;
+	
 
 	@GetMapping("/all")
-	public List<MenuItemDto> getAllMenuItems() {
-	    return menuService.getAllItems();
+	public ResponseEntity<?> getAllMenuItems(
+	        @RequestHeader("X-User-Id") String userIdFromToken,
+	        @RequestHeader("X-User-Role") String userRoleFromToken) {
+
+	    if (!"ADMIN".equalsIgnoreCase(userRoleFromToken)) {
+	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+	                .body("Access denied: Only ADMIN users can view all menu items.");
+	    }
+
+	    return ResponseEntity.ok(menuService.getAllItems());
 	}
 	@GetMapping("/{id}")
 	public MenuItemDto getAllMenuById(@PathVariable Integer id) {
