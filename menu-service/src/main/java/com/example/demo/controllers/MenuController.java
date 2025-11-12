@@ -34,16 +34,11 @@ public class MenuController {
 
 	@GetMapping("/all")
 	public ResponseEntity<?> getAllMenuItems(
-	        @RequestHeader("X-User-Id") String userIdFromToken,
-	        @RequestHeader("X-User-Role") String userRoleFromToken
 	        ) {
 	    return ResponseEntity.ok(menuService.getAllItems());
 	}
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getAllMenuById(@PathVariable Integer id,
-			@RequestHeader("X-User-Id") String userIdFromToken,
-	        @RequestHeader("X-User-Role") String userRoleFromToken
-	        ) {
+	public ResponseEntity<?> getAllMenuById(@PathVariable Integer id) {
 	     menuItems item = repo.findById(id).orElse(null) ;
 	     return ResponseEntity.ok(new MenuItemDto(item.getMenuId(), item.getName(), item.getPrice()));
 	}

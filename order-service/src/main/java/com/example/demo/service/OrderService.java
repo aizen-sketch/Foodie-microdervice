@@ -16,6 +16,8 @@ public class OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private EmailService emailservice;
     
     @Autowired
     private RestTemplate restTemplate;
@@ -61,7 +63,7 @@ public class OrderService {
             items.add(item);
         }
         order.setItems(items);
-
+        emailservice.sendPaymentSuccessEmail("haitpartha0@gmail.com", order.getId(), order.getTotalAmount());
         Order savedOrder = orderRepository.save(order);
 
         // Clear cart after successful order
@@ -75,6 +77,7 @@ public class OrderService {
         e.setTotalAmount(savedOrder.getTotalAmount());
         e.setStatus("payment pending");
         orderProducer.sendOrderPlacedEvent(e);
+        
         return savedOrder;
     }
 
