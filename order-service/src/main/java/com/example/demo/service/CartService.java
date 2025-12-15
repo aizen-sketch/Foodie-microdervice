@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import com.example.demo.Repository.CartRepository;
 import com.example.demo.dto.MenuItemDto;
@@ -89,6 +90,7 @@ public class CartService {
         return cartRepository.save(cart);
     }
 
+    @Transactional
     public Cart clearCart(Long userId) {
         Cart cart = getCartByUser(userId);
         cart.getItems().clear();

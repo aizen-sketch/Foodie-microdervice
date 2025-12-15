@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ import com.example.demo.entity.Payment;
 import com.example.demo.service.PaymentService;
 
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping("/payment")
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -17,11 +18,38 @@ public class PaymentController {
     public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
+    
+    public boolean adminAccess( String userIdFromToken,String userRoleFromToken) {
 
-    @PostMapping("/pay")
-    public ResponseEntity<Payment> makePayment(@RequestBody PaymentRequest request) {
-        Payment payment = paymentService.processPayment(request);
-        return ResponseEntity.ok(payment);
+		if("ADMIN".equalsIgnoreCase(userRoleFromToken))
+		return true;
+		return false;
+		
+	}
+    public ResponseEntity<?> forbiddenAccess(){
+		return new ResponseEntity<>("access denied",HttpStatus.FORBIDDEN); 
+	}
+	public boolean userAccessableWithId(
+			Long userId,String userIdFromToken,String userRoleFromToken) {
+		Long idcheck = Long.parseLong(userIdFromToken);
+		if("USER".equalsIgnoreCase(userRoleFromToken) && idcheck==userId)
+		return true;
+		return false;
+		
+	}
+
+    @PostMapping("/pay/{userId}")
+    public ResponseEntity<?>  makePayment(
+    		@PathVariable Long userId,
+    		@RequestHeader("X-User-Id") String userIdFromToken,
+            @RequestHeader("X-User-Role") String userRoleFromToken,
+            @RequestBody PaymentRequest request) {
+    	if(userAccessableWithId(userId,userIdFromToken,userRoleFromToken)|| adminAccess(userIdFromToken,userRoleFromToken))
+    	{
+    		Payment payment = paymentService.processPayment(request);
+            return ResponseEntity.ok(payment);
+    	}
+    	return forbiddenAccess();
     }
 }
 

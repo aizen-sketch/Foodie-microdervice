@@ -8,7 +8,6 @@ public class PaymentRequest {
     private String cardHolderName;
     private String expiryDate;
     private String cvv;
-    private Double amount;
     private String billingAddress;
 
     // Getters and Setters
@@ -54,12 +53,7 @@ public class PaymentRequest {
     public void setBillingAddress(String billingAddress) {
         this.billingAddress = billingAddress;
     }
-	public Double getAmount() {
-		return amount;
-	}
-	public void setAmount(Double amount) {
-		this.amount = amount;
-	}
+
     
 }
 

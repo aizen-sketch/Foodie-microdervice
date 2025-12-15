@@ -20,7 +20,7 @@ public class PaymentConsumer {
     public void consumeOrderPlacedEvent(OrderPlacedEvent event) {
         System.out.println(" Received OrderPlacedEvent for orderId: " + event.getOrderId());
         System.out.println(" Processing payment of: " + event.getTotalAmount());
-
+        event.setTotalAmount(event.getTotalAmount()*1.05+40);
         // simulate paymentsuccess
         
         try {

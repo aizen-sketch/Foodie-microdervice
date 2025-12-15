@@ -7,18 +7,41 @@ spring:
 
   cloud:
     gateway:
+      # 🔥 GLOBAL CORS CONFIGURATION FOR ALL ROUTES
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"   # React Vite
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - "*"
+            exposedHeaders:
+              - "*"
+            allowCredentials: true
+
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
+
       routes:
-        # --- AUTH SERVICE (no filter, public endpoints) ---
+        # ===============================
+        # AUTH SERVICE - PUBLIC
+        # ===============================
         - id: auth-service
           uri: lb://auth-service
           predicates:
             - Path=/auth/**
-        
-        # --- MENU SERVICE (secured by JWT filter) ---
+
+        # ===============================
+        # MENU SERVICE - SECURED
+        # ===============================
         - id: menu-service
           uri: lb://menu-service
           predicates:
@@ -26,7 +49,9 @@ spring:
           filters:
             - name: AuthenticationFilter
 
-        # --- ORDER SERVICE (secured by JWT filter) ---
+        # ===============================
+        # ORDER SERVICE - SECURED
+        # ===============================
         - id: order-service
           uri: lb://order-service
           predicates:
@@ -34,11 +59,23 @@ spring:
           filters:
             - name: AuthenticationFilter
 
-        # --- PAYMENT SERVICE (secured by JWT filter) ---
+        # ===============================
+        # PAYMENT SERVICE - SECURED
+        # ===============================
         - id: payment-service
           uri: lb://payment-service
           predicates:
             - Path=/payment/**
+          filters:
+            - name: AuthenticationFilter
+
+        # ===============================
+        # USER DETAILS SERVICE - SECURED
+        # ===============================
+        - id: user-details-service
+          uri: lb://user-details-service
+          predicates:
+            - Path=/details/**
           filters:
             - name: AuthenticationFilter
 
@@ -50,7 +87,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
   instance:
-    prefer-ip-address: true
+    prefer-ip-address: false
     hostname: localhost
 
 management:

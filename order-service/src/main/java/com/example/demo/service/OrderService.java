@@ -1,6 +1,8 @@
 package com.example.demo.service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -44,42 +46,59 @@ public class OrderService {
             throw new RuntimeException("Cart is empty. Unable to place order.");
         }
 
-        // Create Order
-        Order order = new Order();
-        order.setUserId(userId);
-        order.setStatus("PENDING");
-        
-        order.setTotalAmount(cart.getTotalAmount());
+        Optional<Order> existingPendingOrder =
+                orderRepository.findByUserIdAndStatus(userId, "PENDING");
 
-        List<OrderItem> items = new ArrayList<>();
+        Order order;
+
+        if (existingPendingOrder.isPresent()) {
+            // ✔ Reuse existing PENDING order
+            order = existingPendingOrder.get();
+
+            // Remove old items but keep the same list instance
+            order.getItems().clear();
+        } else {
+            // ✔ Create new order
+            order = new Order();
+            order.setUserId(userId);
+            order.setStatus("PENDING");
+        }
+
+        // Calculate total
+        order.setTotalAmount(cart.getTotalAmount() * 1.05 + 40);
+
+        // IMPORTANT: Use the helper method
         for (CartItem cartItem : cart.getItems()) {
+
             OrderItem item = new OrderItem();
             item.setMenuItemId(cartItem.getMenuItemId());
-            MenuItemDto menuItem = getMenuItemDetails(item.getMenuItemId());
+
+            MenuItemDto menuItem = getMenuItemDetails(cartItem.getMenuItemId());
             item.setName(menuItem.getName());
             item.setPrice(menuItem.getPrice());
             item.setQuantity(cartItem.getQuantity());
-            item.setOrder(order); // attach to order
-            items.add(item);
+
+            order.addItem(item);   // ✔ Attach item safely
         }
-        order.setItems(items);
-        emailservice.sendPaymentSuccessEmail("haitpartha0@gmail.com", order.getId(), order.getTotalAmount());
+
+        // Save order
         Order savedOrder = orderRepository.save(order);
 
-        // Clear cart after successful order
-        cartService.clearCart(userId);
+        // Publish event
+        OrderPlacedEvent event = new OrderPlacedEvent();
+        event.setUserId(userId);
+        event.setOrderId(savedOrder.getId());
+        event.setItems(savedOrder.getItems()); // ✔ Use saved items
+        event.setTotalAmount(savedOrder.getTotalAmount());
+        event.setStatus("PENDING");
 
-        // ✅ TODO Later: Publish OrderPlacedEvent → Payment & Inventory Services
-        OrderPlacedEvent e=new OrderPlacedEvent();
-        e.setUserId(userId);
-        e.setOrderId(savedOrder.getId());
-        e.setItems(items);
-        e.setTotalAmount(savedOrder.getTotalAmount());
-        e.setStatus("payment pending");
-        orderProducer.sendOrderPlacedEvent(e);
-        
+        orderProducer.sendOrderPlacedEvent(event);
+//        String email = "joyitab82@gmail.com";
+//        long id =1;
+//        emailservice.sendPaymentSuccessEmail(email, id , 10000.0);
         return savedOrder;
     }
+
 
     public Order getOrderById(Long id) {
         return orderRepository.findById(id)

@@ -90,7 +90,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         return chain.filter(newExchange);
                     })
                     .onErrorResume(e -> {
-                        System.out.println("⚠️ Token validation failed: " + e.getMessage());
+                        System.out.println("⚠️ Token validation failed: " + e.getMessage()+"token :-"+token);
                         return onError(exchange, "Token validation failed: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
                     });
         };
