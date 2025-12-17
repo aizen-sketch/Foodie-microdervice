@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 @Entity
@@ -20,6 +21,24 @@ private String name;
 @Column(nullable = false)
 private double price;
 
+@Lob
+@Column(columnDefinition = "LONGBLOB")
+private byte[] image;
+
+private String imageType; // image/png, image/jpeg
+
+public byte[] getImage() {
+	return image;
+}
+public void setImage(byte[] image) {
+	this.image = image;
+}
+public String getImageType() {
+	return imageType;
+}
+public void setImageType(String imageType) {
+	this.imageType = imageType;
+}
 public int getMenuId() {
 	return menuId;
 }
