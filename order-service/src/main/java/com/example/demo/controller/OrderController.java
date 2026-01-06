@@ -67,5 +67,16 @@ public class OrderController {
             return ResponseEntity.ok(order);
     	return forbiddenAccess();
     }
+    // Get all orders :
+    @GetMapping("/all")
+    public ResponseEntity<?>  getAllOrders(
+	        @RequestHeader("X-User-Id") String userIdFromToken,
+	        @RequestHeader("X-User-Role") String userRoleFromToken) {
+    	
+    	List<Order> orders = orderService.getAllOrders();
+    	if( adminAccess(userIdFromToken,userRoleFromToken))
+            return ResponseEntity.ok(orders);
+    	return forbiddenAccess();
+    }
 }
 
